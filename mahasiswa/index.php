@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Cek login
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../auth/login.php");
     exit();
@@ -9,15 +9,14 @@ if (!isset($_SESSION['user_id'])) {
 
 include '../config/konfig.php';
 
-// Fitur pencarian
+
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-// Pagination
+
 $limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Query dengan pencarian dan pagination
 if (!empty($search)) {
     $stmt_count = $conn->prepare("SELECT COUNT(*) as total FROM mahasiswa WHERE nama LIKE ? OR nim LIKE ?");
     $search_param = "%$search%";

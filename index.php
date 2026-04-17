@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Cek apakah sudah login, jika ya redirect ke dashboard
 if (isset($_SESSION['user_id'])) {
     header("Location: dashboard.php");
     exit();
@@ -16,7 +15,7 @@ if (isset($_SESSION['user_id'])) {
     <title>Sistem Manajemen Mahasiswa | Home</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* Tambahan CSS khusus untuk landing page (tidak mengganggu file lain) */
+ 
         .hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -182,7 +181,7 @@ if (isset($_SESSION['user_id'])) {
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+
     <nav class="navbar">
         <div class="navbar-container">
             <a href="index.php" class="navbar-brand">📚 Sistem Manajemen Mahasiswa</a>
@@ -194,7 +193,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </nav>
 
-    <!-- Hero Section -->
+
     <section class="hero">
         <div class="container">
             <h1>Kelola Data Mahasiswa<br>dengan Mudah dan Cepat</h1>
@@ -206,7 +205,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </section>
 
-    <!-- Features Section -->
+
     <section class="features">
         <div class="container">
             <h2 class="section-title">✨ Fitur Unggulan</h2>
@@ -245,7 +244,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section class="cta-section">
         <div class="container">
             <h2>Siap Mengelola Data Mahasiswa?</h2>
@@ -254,7 +252,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </section>
 
-    <!-- Footer -->
+
     <footer class="footer">
         <div class="container">
             <p>&copy; <?php echo date('Y'); ?> Sistem Manajemen Mahasiswa. Dibangun untuk Tugas Besar Pemrograman Web.</p>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Cek login
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: auth/login.php");
     exit();
@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 include 'config/konfig.php';
 
-// Ambil statistik
+
 $total_mahasiswa = 0;
 $result = $conn->query("SELECT COUNT(*) as total FROM mahasiswa");
 if ($result) {
@@ -43,7 +43,7 @@ $nama_user = $_SESSION['nama'] ?? $_SESSION['username'];
     <div class="container">
         <h1>Dashboard</h1>
         
-        <!-- Welcome Card -->
+
         <div class="card">
             <div class="card-header">
                 <h3>Selamat Datang, <?php echo htmlspecialchars($nama_user); ?>! 👋</h3>
@@ -69,7 +69,7 @@ $nama_user = $_SESSION['nama'] ?? $_SESSION['username'];
             </div>
         </div>
         
-        <!-- Quick Actions -->
+
         <div class="card">
             <div class="card-header">
                 <h3>Aksi Cepat</h3>

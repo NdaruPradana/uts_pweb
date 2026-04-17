@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Cek login
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../auth/login.php");
     exit();
@@ -17,13 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nama = $_POST['nama'];
     $jurusan = $_POST['jurusan'];
     
-    // Validasi
+
     $errors = [];
     if (empty($nim)) $errors[] = "NIM harus diisi!";
     if (empty($nama)) $errors[] = "Nama harus diisi!";
     if (empty($jurusan)) $errors[] = "Jurusan harus diisi!";
     
-    // Cek duplikat NIM
+
     if (empty($errors)) {
         $stmt = $conn->prepare("SELECT id FROM mahasiswa WHERE nim = ?");
         $stmt->bind_param("s", $nim);

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Cek login
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../auth/login.php");
     exit();
@@ -11,7 +11,7 @@ include '../config/konfig.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Ambil data mahasiswa
+
 $stmt = $conn->prepare("SELECT * FROM mahasiswa WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -32,13 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nama = $_POST['nama'];
     $jurusan = $_POST['jurusan'];
     
-    // Validasi
+  
     $errors = [];
     if (empty($nim)) $errors[] = "NIM harus diisi!";
     if (empty($nama)) $errors[] = "Nama harus diisi!";
     if (empty($jurusan)) $errors[] = "Jurusan harus diisi!";
     
-    // Cek duplikat NIM (kecuali dirinya sendiri)
+
     if (empty($errors)) {
         $stmt = $conn->prepare("SELECT id FROM mahasiswa WHERE nim = ? AND id != ?");
         $stmt->bind_param("si", $nim, $id);

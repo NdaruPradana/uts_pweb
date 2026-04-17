@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Jika sudah login, redirect ke dashboard
+
 if (isset($_SESSION['user_id'])) {
     header("Location: ../dashboard.php");
     exit();
@@ -21,18 +21,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $errors = [];
     
-    // Validasi tidak boleh kosong
+   
     if (empty($nama)) $errors[] = "Nama lengkap harus diisi!";
     if (empty($username)) $errors[] = "Username harus diisi!";
     if (empty($email)) $errors[] = "Email harus diisi!";
     if (empty($password)) $errors[] = "Password harus diisi!";
     
-    // Validasi email
+
     if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Format email tidak valid!";
     }
     
-    // Validasi password kuat
+  
     if (!empty($password)) {
         if (strlen($password) < 8) {
             $errors[] = "Password minimal 8 karakter!";
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
-    // Cek duplikat username/email
+
     if (empty($errors)) {
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
         $stmt->bind_param("ss", $username, $email);
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->close();
     }
     
-    // Jika tidak ada error, simpan ke database
+   
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         
