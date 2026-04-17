@@ -55,5 +55,9 @@ if (isset($_POST['register'])) {
     mysqli_query($conn, "INSERT INTO users VALUES ('','$nama','$email','$hash')");
 
     echo "Register berhasil!";
+    header("Location: ../dashboard.php");
+    EXIT;
 }
 ?>
+
+<a href="../index.php">Kembali</a>

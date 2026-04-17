@@ -33,4 +33,6 @@ if (isset($_POST['login'])) {
         echo "Email atau password salah!";
     }
 }
+
 ?>
+<a href="../index.php">Kembali</a>
