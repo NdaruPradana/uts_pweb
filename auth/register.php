@@ -1,63 +1,140 @@
 <?php
-include "../config/konfig.php";
-?>
+session_start();
 
-
-
-<form method="POST">
-    <input type="text" name="nama" placeholder="Nama"><br>
-    <input type="email" name="email" placeholder="Email"><br>
-    <input type="password" name="password" placeholder="Password"><br>
-    <button type="submit" name="register">Register</button>
-</form>
-
-<?php
-if (isset($_POST['register'])) {
-
-    $nama = trim($_POST['nama']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-
-    // 1. Tidak boleh kosong
-    if ($nama == "" || $email == "" || $password == "") {
-        echo "Semua field wajib diisi!";
-        return;
-    }
-
-    // 2. Validasi email
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "Format email tidak valid!";
-        return;
-    }
-
-    // 3. Validasi password
-    if (
-        strlen($password) < 8 ||
-        !preg_match("/[A-Z]/", $password) ||
-        !preg_match("/[a-z]/", $password) ||
-        !preg_match("/[0-9]/", $password)
-    ) {
-        echo "Password harus minimal 8 karakter, ada huruf besar, kecil, dan angka!";
-        return;
-    }
-
-    // 4. Cek email duplikat
-    $cek = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
-    if (mysqli_num_rows($cek) > 0) {
-        echo "Email sudah digunakan!";
-        return;
-    }
-
-    // 5. Hash password
-    $hash = password_hash($password, PASSWORD_DEFAULT);
-
-    // 6. Simpan
-    mysqli_query($conn, "INSERT INTO users VALUES ('','$nama','$email','$hash')");
-
-    echo "Register berhasil!";
+// Jika sudah login, redirect ke dashboard
+if (isset($_SESSION['user_id'])) {
     header("Location: ../dashboard.php");
-    EXIT;
+    exit();
+}
+
+include '../config/konfig.php';
+
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $nama = $_POST['nama'];
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    
+    $errors = [];
+    
+    // Validasi tidak boleh kosong
+    if (empty($nama)) $errors[] = "Nama lengkap harus diisi!";
+    if (empty($username)) $errors[] = "Username harus diisi!";
+    if (empty($email)) $errors[] = "Email harus diisi!";
+    if (empty($password)) $errors[] = "Password harus diisi!";
+    
+    // Validasi email
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Format email tidak valid!";
+    }
+    
+    // Validasi password kuat
+    if (!empty($password)) {
+        if (strlen($password) < 8) {
+            $errors[] = "Password minimal 8 karakter!";
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = "Password harus mengandung minimal 1 huruf BESAR!";
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors[] = "Password harus mengandung minimal 1 huruf kecil!";
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $errors[] = "Password harus mengandung minimal 1 angka!";
+        }
+        if ($password !== $confirm_password) {
+            $errors[] = "Konfirmasi password tidak cocok!";
+        }
+    }
+    
+    // Cek duplikat username/email
+    if (empty($errors)) {
+        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
+        $stmt->bind_param("ss", $username, $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $errors[] = "Username atau email sudah terdaftar!";
+        }
+        $stmt->close();
+    }
+    
+    // Jika tidak ada error, simpan ke database
+    if (empty($errors)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        
+        $stmt = $conn->prepare("INSERT INTO users (nama, username, email, password) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $nama, $username, $email, $hashed_password);
+        
+        if ($stmt->execute()) {
+            $success = "Pendaftaran berhasil! Silakan login.";
+        } else {
+            $error = "Gagal mendaftar. Silakan coba lagi.";
+        }
+        $stmt->close();
+    } else {
+        $error = implode("<br>", $errors);
+    }
 }
 ?>
 
-<a href="../index.php">Kembali</a>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Sistem Manajemen Mahasiswa</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Daftar Akun</h2>
+                <p>Buat akun baru untuk memulai</p>
+            </div>
+            <div class="auth-body">
+                <?php if($error): ?>
+                    <div class="alert alert-danger"><?php echo $error; ?></div>
+                <?php endif; ?>
+                <?php if($success): ?>
+                    <div class="alert alert-success"><?php echo $success; ?> <a href="login.php">Login di sini</a></div>
+                <?php endif; ?>
+                
+                <form method="POST" action="">
+                    <div class="form-group">
+                        <label for="nama">Nama Lengkap</label>
+                        <input type="text" id="nama" name="nama" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                        <small class="text-muted">Minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Konfirmasi Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Daftar</button>
+                </form>
+            </div>
+            <div class="auth-footer">
+                <p>Sudah punya akun? <a href="login.php">Login di sini</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
